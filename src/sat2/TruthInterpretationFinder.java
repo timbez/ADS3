@@ -39,7 +39,7 @@ public class TruthInterpretationFinder implements InterpretationFinder {
 
         // unassigned values might be found out through implications
         if (interpretation.size() != atoms.size())
-            findMissingByImplicationGraph(implicationGraph, atoms.size());
+            findMissingByImplicationGraph(implicationGraph);
 
         // by this moment there still can be unassigned values, set them to false
         atoms.forEach(atom -> {
@@ -160,16 +160,7 @@ public class TruthInterpretationFinder implements InterpretationFinder {
         return shouldDeleteClause;
     }
 
-    private void findMissingByImplicationGraph(Graph<Literal> implicationGraph, Integer maxDepth) {
-        findMissingByImplicationGraph(implicationGraph, 0, maxDepth);
-    }
-
-    private void findMissingByImplicationGraph(Graph<Literal> implicationGraph, Integer currentDepth, Integer maxDepth) {
-        if (currentDepth.equals(maxDepth))
-            return;
-
-        currentDepth++;
-
+    private void findMissingByImplicationGraph(Graph<Literal> implicationGraph) {
         for (Pair<Literal> pair : implicationGraph.getPairs()) {
             Literal first = pair.getFirst();
             Atom firstAtom = first.getAtom();
@@ -180,7 +171,7 @@ public class TruthInterpretationFinder implements InterpretationFinder {
             if (interpretation.containsKey(firstAtom) && !interpretation.containsKey(secondAtom)) {
                 if (first.evaluate(interpretation.get(firstAtom))) {
                     interpretation.put(secondAtom, !second.isNegated());
-                    findMissingByImplicationGraph(implicationGraph, currentDepth, maxDepth);
+                    findMissingByImplicationGraph(implicationGraph);
                 }
             }
         }
